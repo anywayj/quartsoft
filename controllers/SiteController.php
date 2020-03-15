@@ -33,7 +33,7 @@ class SiteController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'create', 'article', 'plan', 'view'],
+                        'actions' => ['logout', 'index', 'create', 'article', 'plan', 'checkout', 'make-payment'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -63,6 +63,34 @@ class SiteController extends Controller
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
         ];
+    }
+
+    public function actionCheckout($id, $name, $price)
+    {
+        $params = [
+            'method' => 'paypal',
+            'intent' => 'sale',
+            'productId' => $id,
+            'order' => [
+                'description' => $name,
+                'total' => $price,
+                'currency' => 'USD'
+            ]
+        ];
+
+        // In this action you will redirect to the PayPal website to login with you buyer account and complete the payment
+        Yii::$app->PayPalRestApi->checkOut($params);
+    }
+
+    public function actionMakePayment()
+    {
+        if (isset(Yii::$app->request->get()['success']) && Yii::$app->request->get()['success'] == 'true') {
+            Yii::$app->PayPalRestApi->processPayment();
+            Yii::$app->session->setFlash('success', 'Подписка оформлена!');
+            return $this->redirect('/site/plan');
+        }
+
+        return null;
     }
 
     /**
@@ -118,23 +146,6 @@ class SiteController extends Controller
         return $this->render('plan', [
             'planQuery' => $planQuery,
             'paymentQuery' => $paymentQuery,
-        ]);
-    }
-
-    public function actionView($id)
-    {
-        $modelPayment = new Payment();
-        $modelPayment->payment_user_id = Yii::$app->user->identity->id;
-        $modelPayment->payment_created_at = date('Y-m-d H:i:s');
-
-        if ($modelPayment->load(Yii::$app->request->post()) && $modelPayment->save()) {
-            Yii::$app->session->setFlash('success', 'Подписка оформлена!');
-            return $this->redirect('/site/plan');
-        }
-
-        return $this->render('buyPlan', [
-            'model' => $this->findModelPlan($id),
-            'modelPayment' => $modelPayment,
         ]);
     }
 

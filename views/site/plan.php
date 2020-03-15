@@ -57,7 +57,11 @@ FrontendAsset::register($this);
                         <p>Цена: <b><?= $plan['plan_price'] ?></b></p>
                         <? if (empty($subscribed) || $allowedBuyPlan) { ?>
                             <? $issetPlan = false ?>
-                            <?= Html::a('Купить &raquo;', ['view', 'id' => $plan['plan_id']], ['class' => 'btn btn-success']) ?>
+                            <?= Html::a(
+                                Yii::t('app', 'Купить PayPal &raquo;'),
+                                ['/site/checkout', 'id' => $plan['plan_id'], 'name' => $plan['plan_name'], 'price' => $plan['plan_price']],
+                                ['class' => 'btn btn-success']
+                            ) ?>
                         <? } ?>
                     </div>
                 <? } ?>
