@@ -1,4 +1,5 @@
-Instructions 
+# Instructions 
+
   # CKEditor Расширение для Yii2
   CKEditor — свободный WYSIWYG-редактор, который может быть использован на веб-страницах.
 
@@ -7,6 +8,6 @@ Instructions
   # PayPal PHP SDK
   composer require paypal/rest-api-sdk-php: *
 
-  # database
-  1. Create db with name "quartsoft"
+  # Database
+  1. create db with name "quartsoft"
   2. yii migrate
