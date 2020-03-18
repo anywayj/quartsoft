@@ -55,12 +55,21 @@ class ArticleController extends Controller
     {
         $article = new Article();
         $article->article_id = Yii::$app->user->identity->id;
+        $statusActive = $article::STATUS_ACTIVE;
 
         $articleQuery = Yii::$app->db->createCommand("
              SELECT * FROM article 
                 JOIN user ON article.article_user_id = user.id
                 JOIN record_user ON record_user.id = user.id
              WHERE article.article_user_id = '$article->article_id' 
+        ")->queryAll();
+
+        $articleQueryActive = Yii::$app->db->createCommand("
+             SELECT * FROM article 
+                JOIN user ON article.article_user_id = user.id
+                JOIN record_user ON record_user.id = user.id
+             WHERE article.article_user_id = '$article->article_id'
+             AND article.article_status = '$statusActive'
         ")->queryAll();
 
         $searchModel = new ArticleSearch();
@@ -70,6 +79,7 @@ class ArticleController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'articleQuery' => $articleQuery,
+            'articleQueryActive' => $articleQueryActive,
         ]);
     }
 

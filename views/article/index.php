@@ -67,11 +67,27 @@ $this->params['breadcrumbs'][] = $this->title;
                 <h3><?= $article['article_name'] ?></h3>
 
                 <p><?= $article['article_text'] ?></p>
-
-                <p><b>Автор:</b> <?= $article['firstname'] ?></p>
             </div>
         <? } ?>
         <? if (count($articleQuery) === 0) { ?>
+            <div class="block col-lg-4">
+                <p><b><?= 'No results found.' ?></b></p>
+            </div>
+        <? } ?>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h2>Активные публикации</h2>
+        </div>
+        <? foreach($articleQueryActive as $article) { ?>
+            <div class="block col-lg-4">
+                <h3><?= $article['article_name'] ?></h3>
+
+                <p><?= $article['article_text'] ?></p>
+            </div>
+        <? } ?>
+        <? if (count($articleQueryActive) === 0) { ?>
             <div class="block col-lg-4">
                 <p><b><?= 'No results found.' ?></b></p>
             </div>

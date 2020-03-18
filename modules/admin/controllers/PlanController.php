@@ -75,6 +75,10 @@ class PlanController extends Controller
      */
     public function actionCreate()
     {
+        if (Yii::$app->user->id !== \app\models\User::ADMIN) {
+            return $this->redirect('/site/error');
+        }
+
         $model = new Plan();
         $model->plan_created_at = date('Y-m-d H:i:s');
         $model->plan_updated_at = date('Y-m-d H:i:s');
@@ -97,6 +101,10 @@ class PlanController extends Controller
      */
     public function actionUpdate($id)
     {
+        if (Yii::$app->user->id !== \app\models\User::ADMIN) {
+            return $this->redirect('/site/error');
+        }
+
         $model = $this->findModel($id);
         $model->plan_updated_at = date('Y-m-d H:i:s');
 
@@ -118,6 +126,10 @@ class PlanController extends Controller
      */
     public function actionDelete($id)
     {
+        if (Yii::$app->user->id !== \app\models\User::ADMIN) {
+            return $this->redirect('/site/error');
+        }
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

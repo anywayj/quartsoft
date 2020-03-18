@@ -19,7 +19,10 @@ $config = [
         ],
     ],   
     'components' => [
-
+        'PayPalRestApi' => [
+            'class' => 'app\components\PayPalRestApi',
+            'redirectUrl' => '/site/make-payment', // Redirect Url after payment
+        ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
             'cache' => 'cache' //Включаем кеширование 
@@ -27,14 +30,11 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',  // Подключаем файловое кэширование данных
         ],
-        
+
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'e03MnGhmYO-UJPnFmwKiv1ic3Ql8a8YD',
             'baseUrl' => '',
-        ],
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
         ],
         'user' => [
             'identityClass' => 'app\models\User',

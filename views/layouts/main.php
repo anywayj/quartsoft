@@ -38,7 +38,7 @@ FrontendAsset::register($this);
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => [
                     ['label' => 'Главная', 'url' => ['/site/index']],
-                    ['label' => 'Админка', 'url' => ['/admin/plan/index'], 'visible' => Yii::$app->user->identity->id === User::ADMIN],
+                    ['label' => 'Админка', 'url' => ['/admin/plan/index'], 'visible' => Yii::$app->user->id === User::ADMIN],
                     $isGuest ? (
                         ['label' => 'Вход', 'url' => ['/site/login']]
                     ) : (
