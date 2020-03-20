@@ -1,4 +1,4 @@
-#Instructions 
+# Instructions 
 
 ### CKEditor Расширение для Yii2
 >CKEditor — свободный WYSIWYG-редактор, который может быть использован на веб-страницах.
