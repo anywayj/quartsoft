@@ -59,7 +59,7 @@ FrontendAsset::register($this);
                             <? $issetPlan = false ?>
                             <?= Html::a(
                                 Yii::t('app', 'Купить PayPal &raquo;'),
-                                ['/site/checkout', 'id' => $plan['plan_id'], 'name' => $plan['plan_name'], 'price' => $plan['plan_price']],
+                                ['/site/checkout', 'planId' => $plan['plan_id'], 'price' => $plan['plan_price']],
                                 ['class' => 'btn btn-success']
                             ) ?>
                         <? } ?>

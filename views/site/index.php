@@ -6,7 +6,7 @@ use yii\grid\GridView;
 
 <div class="body-content">
     <div class="row">
-        <? if (count($articleUsers)) { ?>
+        <? if (count($articleQuery)) { ?>
             <?= $this->render('_searchArticle', ['model' => $searchModel]); ?>
         <? } ?>
 

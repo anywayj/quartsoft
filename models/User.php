@@ -133,10 +133,6 @@ class User extends ActiveRecord implements IdentityInterface
      * @param string $password password to validate
      * @return bool if password provided is valid for current user
      */
-
-
-   
-
     public function validatePassword($password)
     {
         return Yii::$app->security->validatePassword($password, $this->password_hash);
@@ -151,7 +147,6 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
-
  
     /**
      * Generates "remember me" authentication key
@@ -161,15 +156,8 @@ class User extends ActiveRecord implements IdentityInterface
         $this->auth_key = Yii::$app->security->generateRandomString();
     }
 
-    public function getRecordusers()
-    {
-        return $this->hasOne(RecordUser::className(), ['id' => 'id']);
-    }
-
     public function getRecordUser()
     {
         return $this->hasOne(RecordUser::className(), ['id' => 'id']);
     }
-   
-    
 }

@@ -59,9 +59,19 @@ class Article extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getActiveArticles()
+    {
+        return self::find()->where(['article_status' => self::STATUS_ACTIVE])->all();
+    }
+
+    public function getCurrentUserArticles()
+    {
+        return self::find()->where(['article_user_id' => Yii::$app->user->id])->all();
+    }
+
     public function defaultSettings($model)
     {
-        $model->article_user_id = Yii::$app->user->identity->id;
+        $model->article_user_id = Yii::$app->user->id;
         $model->article_created_at = date('Y-m-d H:i:s');
         $model->article_updated_at = date('Y-m-d H:i:s');
         $model->article_status = self::STATUS_DISABLE;

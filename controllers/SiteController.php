@@ -12,10 +12,11 @@ use app\models\LoginForm;
 use app\models\SignupForm;
 use app\models\SignupFormtwo;
 use app\models\RecordUser;
-use app\models\Plan;
 use app\models\Payment;
+use app\models\Plan;
 use app\models\Article;
 use app\models\ArticleSearch;
+use yii\web\NotFoundHttpException;
 
 class SiteController extends Controller
 {
@@ -58,34 +59,20 @@ class SiteController extends Controller
             'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
         ];
     }
 
-    public function actionCheckout($id, $name, $price)
+    public function actionCheckout($planId, $price)
     {
-        $params = [
-            'method' => 'paypal',
-            'intent' => 'sale',
-            'productId' => $id,
-            'order' => [
-                'description' => $name,
-                'total' => $price,
-                'currency' => 'USD'
-            ]
-        ];
-
-        // In this action you will redirect to the PayPal website to login with you buyer account and complete the payment
-        Yii::$app->PayPalRestApi->checkOut($params);
+        Yii::$app->PayPalRestApi->checkOut($planId, $price);
     }
 
     public function actionMakePayment()
     {
-        if (isset(Yii::$app->request->get()['success']) && Yii::$app->request->get()['success'] == 'true') {
-            Yii::$app->PayPalRestApi->processPayment();
+        if ($response = Yii::$app->PayPalRestApi->processPayment()) {
+            $payment = new Payment();
+            $planId = $response['transactions']['0']['custom'];
+            $payment->savePayment($payment, $planId);
             Yii::$app->session->setFlash('success', 'Подписка оформлена!');
             return $this->redirect('/site/plan');
         }
@@ -100,28 +87,14 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $article = new Article();
-        $statusActive = $article::STATUS_ACTIVE;
-        $articleQuery = Yii::$app->db->createCommand("
-            SELECT * FROM article WHERE article_status = '$statusActive'
-        ")->queryAll();
-
-        $articleUsers = [];
-        foreach($articleQuery as $article) {
-            $articleUsers[] = $article['article_user_id'];
-        }
-
-        $article = new ActiveDataProvider([
-            'query' => Article::find()
-                ->where(['article_status' => $statusActive])
-        ]);
-
+        $modelArticle = new Article;
+        $articleQuery = $modelArticle->getActiveArticles();
+        $article = new ActiveDataProvider(['query' => $articleQuery]);
         $searchModel = new ArticleSearch();
-        $dataProvider = $searchModel->searchMain(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->searchActiveArticles(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'article' => $article,
-            'articleUsers' => $articleUsers,
             'articleQuery' => $articleQuery,
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
@@ -130,38 +103,13 @@ class SiteController extends Controller
 
     public function actionPlan()
     {
-        $planQuery = Yii::$app->db->createCommand('
-            SELECT * FROM plan
-        ')->queryAll();
-
-        $payment = new Payment();
-        $payment->payment_user_id = Yii::$app->user->identity->id;
-        $paymentQuery = Yii::$app->db->createCommand("
-            SELECT * FROM payment
-            JOIN plan
-            ON plan.plan_id = payment.payment_plan_id
-            WHERE payment_user_id = '$payment->payment_user_id'
-        ")->queryAll();
+        $planQuery = Plan::find()->all();
+        $modelPayment = new Payment;
+        $paymentQuery = $modelPayment->getCurrentUserPayments();
 
         return $this->render('plan', [
             'planQuery' => $planQuery,
             'paymentQuery' => $paymentQuery,
-        ]);
-    }
-
-    public function actionCreate()
-    {
-        $model = new Payment();
-        $model->payment_user_id = Yii::$app->user->identity->id;
-        $model->payment_created_at = date('Y-m-d H:i:s');
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Подписка оформлена!');
-            return $this->redirect('/site/index');
-        }
-
-        return $this->render('createPayment', [
-            'model' => $model,
         ]);
     }
 
@@ -219,18 +167,16 @@ class SiteController extends Controller
         return $this->goHome();
     }
 
+    /**
+     * Finds the RecordUser model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return RecordUser the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
     protected function findModel($id)
     {
         if (($model = RecordUser::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    protected function findModelPlan($id)
-    {
-        if (($model = Plan::findOne($id)) !== null) {
             return $model;
         }
 

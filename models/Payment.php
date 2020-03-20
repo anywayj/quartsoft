@@ -47,8 +47,23 @@ class Payment extends \yii\db\ActiveRecord
         ];
     }
 
+    public function savePayment($payment, $planId)
+    {
+        $payment->payment_user_id = Yii::$app->user->id;
+        $payment->payment_plan_id = $planId;
+        $payment->payment_created_at = date('Y-m-d H:i:s');
+        $payment->save();
+
+        return $payment;
+    }
+
+    public function getCurrentUserPayments()
+    {
+       return self::find()->where(['payment_user_id' => Yii::$app->user->id])->all();
+    }
+
     public function getPlan()
     {
-        return $this->hasOne(User::className(), ['plan_id' => 'payment_plan_id']);
+        return $this->hasOne(Plan::className(), ['plan_id' => 'payment_plan_id']);
     }
 }

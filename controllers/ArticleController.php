@@ -53,24 +53,13 @@ class ArticleController extends Controller
      */
     public function actionIndex()
     {
-        $article = new Article();
-        $article->article_id = Yii::$app->user->identity->id;
-        $statusActive = $article::STATUS_ACTIVE;
+        $modelArticle = new Article;
+        $articleQuery = $modelArticle->getCurrentUserArticles();
 
-        $articleQuery = Yii::$app->db->createCommand("
-             SELECT * FROM article 
-                JOIN user ON article.article_user_id = user.id
-                JOIN record_user ON record_user.id = user.id
-             WHERE article.article_user_id = '$article->article_id' 
-        ")->queryAll();
-
-        $articleQueryActive = Yii::$app->db->createCommand("
-             SELECT * FROM article 
-                JOIN user ON article.article_user_id = user.id
-                JOIN record_user ON record_user.id = user.id
-             WHERE article.article_user_id = '$article->article_id'
-             AND article.article_status = '$statusActive'
-        ")->queryAll();
+        $articleQueryActive = Article::find()
+            ->where(['article_user_id' => Yii::$app->user->id])
+            ->andWhere(['article_status' => $modelArticle::STATUS_ACTIVE])
+            ->all();
 
         $searchModel = new ArticleSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -125,25 +114,12 @@ class ArticleController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $model->article_status = Article::STATUS_ACTIVE;
         $model->article_updated_at = date('Y-m-d H:i:s');
 
-        $payment = new Payment();
-        $payment->payment_user_id = Yii::$app->user->identity->id;
-        $paymentQuery = Yii::$app->db->createCommand("
-            SELECT * FROM payment
-            JOIN plan
-            ON plan.plan_id = payment.payment_plan_id
-            WHERE payment_user_id = '$payment->payment_user_id'
-        ")->queryAll();
-
-        $article = new Article();
-        $article->article_id = Yii::$app->user->identity->id;
-        $articleQuery = Yii::$app->db->createCommand("
-             SELECT * FROM article JOIN user
-             ON article.article_user_id = user.id
-             WHERE article.article_user_id = '$article->article_id' 
-        ")->queryAll();
+        $modelPayment = new Payment();
+        $paymentQuery = $modelPayment->getCurrentUserPayments();
+        $modelArticle = new Article();
+        $articleQuery = $modelArticle->getCurrentUserArticles();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->article_id]);

@@ -3,8 +3,6 @@
 namespace app\components;
 
 use PayPal\Api\Amount;
-use PayPal\Api\Details;
-use PayPal\Api\ItemList;
 use PayPal\Api\Payer;
 use PayPal\Api\Payment;
 use PayPal\Api\RedirectUrls;
@@ -33,24 +31,18 @@ class PayPalRestApi
         $this->apiContext = $apiContext;
     }
 
-    public function checkOut($params)
+    public function checkOut($planId, $price)
     {
         $payer = new Payer();
-        $payer->setPaymentMethod($params['method']);
-        $orderList = [];
-
-        $itemList = new ItemList();
-        $itemList->setItems($orderList);
+        $payer->setPaymentMethod('paypal');
 
         $amount = new Amount();
-        $amount->setCurrency($params['order']['currency'])
-            ->setTotal($params['order']['total']);
+        $amount->setCurrency('USD')
+            ->setTotal($price);
 
         $transaction = new Transaction();
         $transaction->setAmount($amount)
-            ->setItemList($itemList)
-            ->setDescription($params['order']['description'])
-            ->setCustom($params['productId'])
+            ->setCustom($planId)
             ->setInvoiceNumber(uniqid());
 
         $redirectUrl = Url::to([$this->redirectUrl], true);
@@ -59,7 +51,7 @@ class PayPalRestApi
             ->setCancelUrl("$redirectUrl?success=false");
 
         $payment = new Payment();
-        $payment->setIntent($params['intent'])
+        $payment->setIntent('sale')
             ->setPayer($payer)
             ->setRedirectUrls($redirectUrls)
             ->setTransactions([$transaction]);
@@ -73,17 +65,11 @@ class PayPalRestApi
         if (isset(Yii::$app->request->get()['success']) && Yii::$app->request->get()['success'] == 'true') {
             $execution = new PaymentExecution();
             $transaction = new Transaction();
-            $details = new Details();
-            $amount = new Amount();
 
             $paymentId = Yii::$app->request->get()['paymentId'];
             $payment = Payment::get($paymentId, $this->apiContext);
 
             $execution->setPayerId(Yii::$app->request->get()['PayerID']);
-
-            $amount->setDetails($details);
-
-            $transaction->setAmount($amount);
             $execution->addTransaction($transaction);
 
             try {
@@ -99,13 +85,7 @@ class PayPalRestApi
                 \Yii::$app->response->data = $ex->getData();
             }
             \Yii::$app->response->data = $payment;
-            $paymentToJson = Json::decode(\Yii::$app->response->data);
-
-            $payment = new \app\models\Payment();
-            $payment->payment_user_id = Yii::$app->user->id;
-            $payment->payment_plan_id = $paymentToJson['transactions']['0']['custom'];
-            $payment->payment_created_at = date('Y-m-d H:i:s');
-            $payment->save();
+            return Json::decode(\Yii::$app->response->data);
         }
 
         return null;

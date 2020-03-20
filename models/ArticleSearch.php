@@ -28,7 +28,6 @@ class ArticleSearch extends Article
      */
     public function scenarios()
     {
-        // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
 
@@ -41,9 +40,7 @@ class ArticleSearch extends Article
      */
     public function search($params)
     {
-        $query = Article::find()->where(['article_user_id' => Yii::$app->user->identity->id]);
-
-        // add conditions that should always apply here
+        $query = Article::find()->where(['article_user_id' => Yii::$app->user->id]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -52,12 +49,9 @@ class ArticleSearch extends Article
         $this->load($params);
 
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
             return $dataProvider;
         }
 
-        // grid filtering conditions
         $query->andFilterWhere([
             'article_id' => $this->article_id,
             'article_user_id' => $this->article_user_id,
@@ -72,11 +66,9 @@ class ArticleSearch extends Article
         return $dataProvider;
     }
 
-    public function searchMain($params)
+    public function searchActiveArticles($params)
     {
         $query = Article::find()->where(['article_status' => Article::STATUS_ACTIVE]);
-
-        // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -85,12 +77,9 @@ class ArticleSearch extends Article
         $this->load($params);
 
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
             return $dataProvider;
         }
 
-        // grid filtering conditions
         $query->andFilterWhere([
             'article_user_id' => $this->article_user_id,
         ]);

@@ -25,7 +25,7 @@ FrontendAsset::register($this);
 <body>
 <? $this->beginBody() ?>
 <? $isGuest = Yii::$app->user->isGuest ?>
-<? $user = Yii::$app->user->identity->recordusers; ?>
+<? $user = Yii::$app->user->identity->recordUser; ?>
     <div class="wrap">
         <? NavBar::begin([
                 'brandLabel' => Yii::$app->name . ' <b>QuartSoft</b>',

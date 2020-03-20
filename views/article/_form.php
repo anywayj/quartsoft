@@ -25,7 +25,7 @@ use yii\widgets\ActiveForm;
 
     <? if (isset($paymentQuery) && isset($articleQuery)) {
         foreach ($paymentQuery as $payment) {
-            $countPlanPub = $payment['plan_pub_amount'];
+            $countPlanPub = $payment->plan['plan_pub_amount'];
         }
         foreach ($articleQuery as $article) {
             $countArticles[] = $article['article_status'];
