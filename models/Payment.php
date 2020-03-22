@@ -47,8 +47,9 @@ class Payment extends \yii\db\ActiveRecord
         ];
     }
 
-    public function savePayment($payment, $planId)
+    public function savePayment($planId)
     {
+        $payment = new Payment();
         $payment->payment_user_id = Yii::$app->user->id;
         $payment->payment_plan_id = $planId;
         $payment->payment_created_at = date('Y-m-d H:i:s');

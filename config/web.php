@@ -23,6 +23,21 @@ $config = [
             'class' => 'app\components\PayPalRestApi',
             'redirectUrl' => '/site/make-payment', // Redirect Url after payment
         ],
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'google' => [
+                    'class' => 'yii\authclient\clients\Google',
+                    'clientId' => 'google_client_id',
+                    'clientSecret' => 'google_client_secret',
+                ],
+                'facebook' => [
+                    'class' => 'yii\authclient\clients\Facebook',
+                    'clientId' => '148831293071990',
+                    'clientSecret' => '64d54b30d8fb233df73f091c8dc94f1c',
+                ],
+            ],
+        ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
             'cache' => 'cache' //Включаем кеширование 

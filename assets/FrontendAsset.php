@@ -20,7 +20,7 @@ class FrontendAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'css/frontend/main.css',
+        'css/frontend/main1.css',
     ];
     public $js = [
     ];

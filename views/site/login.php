@@ -44,6 +44,13 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-lg-offset-1 col-lg-11">
                 <?= Html::submitButton('Войти', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                 <?= Html::a(Yii::t('app', 'Регистрация'), ['/site/signup'] , ['class' => 'btn btn-info']) ?>
+                <?= yii\authclient\widgets\AuthChoice::widget([
+                    'baseAuthUrl' => ['site/auth'],
+                    'popupMode' => false,
+                    'options' => [
+                        'class' => 'auth-clients-holder'
+                    ]
+                ]) ?>
             </div>
 
         </div>

@@ -132,3 +132,8 @@ thead tr th {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.auth-clients-holder {
+    display: inline-block;
+    vertical-align: top;
+}

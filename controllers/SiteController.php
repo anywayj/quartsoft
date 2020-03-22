@@ -17,6 +17,7 @@ use app\models\Plan;
 use app\models\Article;
 use app\models\ArticleSearch;
 use yii\web\NotFoundHttpException;
+use app\components\AuthHandler;
 
 class SiteController extends Controller
 {
@@ -30,7 +31,7 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'signup', 'index'],
+                        'actions' => ['login', 'error', 'signup', 'index', 'auth'],
                         'allow' => true,
                     ],
                     [
@@ -59,7 +60,16 @@ class SiteController extends Controller
             'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
+            'auth' => [
+                'class' => 'yii\authclient\AuthAction',
+                'successCallback' => [$this, 'onAuthSuccess'],
+            ],
         ];
+    }
+
+    public function onAuthSuccess($client)
+    {
+        (new AuthHandler($client))->handle();
     }
 
     public function actionCheckout($planId, $price)
@@ -72,7 +82,7 @@ class SiteController extends Controller
         if ($response = Yii::$app->PayPalRestApi->processPayment()) {
             $payment = new Payment();
             $planId = $response['transactions']['0']['custom'];
-            $payment->savePayment($payment, $planId);
+            $payment->savePayment($planId);
             Yii::$app->session->setFlash('success', 'Подписка оформлена!');
             return $this->redirect('/site/plan');
         }
@@ -123,9 +133,7 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post())
             && $modelTwo->load(Yii::$app->request->post())
         ) {
-            if ($model->signup()
-                && $modelTwo->signupTwo()
-            ) {
+            if ($model->signup() && $modelTwo->signupTwo()) {
                 Yii::$app->session->setFlash('success', 'Спасибо за регистрацию!');
                 return $this->redirect('/site/login'); 
             }  
